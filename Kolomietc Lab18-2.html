@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Гра "Вибери числа"</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        #gameContainer {
+            margin-top: 50px;
+        }
+        #numberGrid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .number {
+            font-size: 16px;
+            padding: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .number:hover {
+            background-color: lightblue;
+        }
+        #startOverButton {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        #statsTable {
+            margin-top: 30px;
+            width: 50%;
+            margin-left: auto;
+            margin-right: auto;
+            border-collapse: collapse;
+        }
+        #statsTable th, #statsTable td {
+            border: 1px solid black;
+            padding: 8px;
+        }
+        .bestResult {
+            background-color: lightgreen;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="timer">Час: <span id="countdown">60</span> секунд</div>
+        <div id="numberGrid"></div>
+        <button id="startOverButton">Почати з початку</button>
+        <table id="statsTable">
+            <thead>
+                <tr>
+                    <th>Спроба</th>
+                    <th>Результат</th>
+                </tr>
+            </thead>
+            <tbody id="statsBody">
+                <!-- Тут будуть вставлятися дані з JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Генеруємо випадковий порядок чисел від 1 до 20
+        let numbers = [];
+        for (let i = 1; i <= 20; i++) {
+            numbers.push(i);
+        }
+        shuffleArray(numbers);
+
+        // Створюємо кнопки з цифрами для гри
+        const numberGrid = document.getElementById('numberGrid');
+        numbers.forEach(number => {
+            const button = document.createElement('button');
+            button.textContent = number;
+            button.classList.add('number');
+            button.style.fontSize = `${Math.floor(Math.random() * 16) + 10}px`; // Випадковий розмір шрифту
+            button.style.color = getRandomColor(); // Випадковий колір тексту
+            button.addEventListener('click', () => selectNumber(number));
+            numberGrid.appendChild(button);
+        });
+
+        let attempts = 0; // Лічильник спроб
+
+        function selectNumber(selectedNumber) {
+            attempts++;
+            if (selectedNumber !== attempts) {
+                alert('Не вірна цифра. Спробуйте ще раз.');
+                attempts--;
+            } else {
+                alert(`Ви вибрали правильну цифру ${selectedNumber}.`);
+                // Помітити вибрану цифру
+                document.querySelectorAll('.number')[selectedNumber - 1].classList.add('selected');
+            }
+            updateStats();
+        }
+
+        function updateStats() {
+            const statsTable = document.getElementById('statsBody');
+            const row = document.createElement('tr');
+            const cell1 = document.createElement('td');
+            const cell2 = document.createElement('td');
+            cell1.textContent = `Спроба ${attempts}`;
+            cell2.textContent = attempts === selectedNumber ? `Правильно вибрано` : `Не вірно`;
+            row.appendChild(cell1);
+            row.appendChild(cell2);
+            statsTable.appendChild(row);
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        document.getElementById('startOverButton').addEventListener('click', () => {
+            window.location.reload(); // Перезавантаження сторінки для нової гри
+        });
+
+        // Таймер обмеження часу гри
+        let timeLeft = 60;
+        const countdownTimer = setInterval(() => {
+            timeLeft--;
+            document.getElementById('countdown').textContent = timeLeft;
+            if (timeLeft === 0) {
+                clearInterval(countdownTimer);
+                alert('Час вийшов! Гра завершена.');
+                window.location.reload();
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
